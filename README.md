@@ -2,7 +2,7 @@
 
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blue)](https://code.claude.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/jaehyunjang/vibe-skills)
+[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/NewTurn2017/vibe-skills)
 
 **Vibe Coding**은 AI와 개발자가 협업하는 체계적인 개발 방법론입니다. 계획과 실행을 명확히 분리하여 개발자가 아키텍처 주도권을 유지하면서 AI의 생산성을 극대화합니다.
 
@@ -896,10 +896,10 @@ MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 
 ## 🔗 링크
 
-- [GitHub Repository](https://github.com/jaehyunjang/vibe-skills)
+- [GitHub Repository](https://github.com/NewTurn2017/vibe-skills)
 - [Claude Code Plugin Store](https://code.claude.com/plugins/vibe-skills)
-- [문제 신고](https://github.com/jaehyunjang/vibe-skills/issues)
-- [토론 포럼](https://github.com/jaehyunjang/vibe-skills/discussions)
+- [문제 신고](https://github.com/NewTurn2017/vibe-skills/issues)
+- [토론 포럼](https://github.com/NewTurn2017/vibe-skills/discussions)
 
 ## 🙏 감사의 말
 
@@ -914,4 +914,4 @@ MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 
 **Made with ❤️ by Jaehyun Jang & Claude**
 
-*질문이나 제안사항이 있으시면 [이슈](https://github.com/jaehyunjang/vibe-skills/issues)를 생성해 주세요!*
+*질문이나 제안사항이 있으시면 [이슈](https://github.com/NewTurn2017/vibe-skills/issues)를 생성해 주세요!*
