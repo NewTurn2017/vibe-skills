@@ -1,0 +1,183 @@
+# Claude Code Plugin Configuration
+# https://code.claude.com/docs/ko/plugins
+
+[plugin]
+name = "vibe-skills"
+version = "2.0.0"
+description = "AI 주도 개발 방법론 - 체계적인 4단계 워크플로우 (리서치→계획→구현→리뷰)"
+author = "Jaehyun Jang"
+homepage = "https://github.com/jaehyunjang/vibe-skills"
+license = "MIT"
+keywords = ["development", "methodology", "workflow", "ai-assisted", "korean"]
+
+# Claude Code 최소 버전 요구사항
+[requirements]
+claude_code_version = ">=1.0.0"
+node_version = ">=18.0.0"
+
+# 스킬 정의
+[[skills]]
+name = "vibe-research"
+description = "코드베이스 심층 분석 및 문서화"
+entry = "skills/vibe-research/index.js"
+arguments = [
+  { name = "topic", type = "string", required = true, description = "분석할 주제 또는 기능" },
+  { name = "--deep", type = "boolean", default = false, description = "성능 프로파일링 및 메모리 분석 포함" },
+  { name = "--patterns", type = "boolean", default = false, description = "코드 패턴 및 안티패턴 감지" },
+  { name = "--graph", type = "boolean", default = false, description = "의존성 그래프 시각화" }
+]
+
+[[skills]]
+name = "vibe-plan"
+description = "AI 기반 구현 계획 수립 및 리뷰"
+entry = "skills/vibe-plan/index.js"
+arguments = [
+  { name = "--research", type = "string", optional = true, description = "특정 리서치 파일 지정" },
+  { name = "--feedback", type = "boolean", default = false, description = "인라인 메모 피드백 반영" },
+  { name = "--review", type = "boolean", default = false, description = "AI 계획 리뷰 실행" },
+  { name = "--risk-analysis", type = "boolean", default = false, description = "상세 리스크 분석" }
+]
+
+[[skills]]
+name = "vibe-implement"
+description = "승인된 계획 기반 자동 구현"
+entry = "skills/vibe-implement/index.js"
+arguments = [
+  { name = "--plan", type = "string", optional = true, description = "특정 plan 파일 지정" },
+  { name = "--parallel", type = "boolean", default = false, description = "병렬 실행 모드" },
+  { name = "--watch", type = "boolean", default = false, description = "실시간 모니터링" },
+  { name = "--rollback-on-fail", type = "boolean", default = false, description = "실패 시 자동 롤백" },
+  { name = "--dry-run", type = "boolean", default = false, description = "시뮬레이션 모드" }
+]
+
+[[skills]]
+name = "vibe-review"
+description = "자동 코드 리뷰 및 품질 분석"
+entry = "skills/vibe-review/index.js"
+arguments = [
+  { name = "--branch", type = "string", optional = true, description = "특정 브랜치 리뷰" },
+  { name = "--focus", type = "string", optional = true, description = "집중 리뷰 영역 (security/performance/testing/architecture)" },
+  { name = "--pr-ready", type = "boolean", default = false, description = "PR 템플릿 생성" },
+  { name = "--auto-fix", type = "boolean", default = false, description = "자동 수정 실행" },
+  { name = "--strict", type = "boolean", default = false, description = "엄격한 기준 적용" }
+]
+
+# 플러그인 설정 스키마
+[config]
+schema = """
+{
+  "type": "object",
+  "properties": {
+    "research": {
+      "type": "object",
+      "properties": {
+        "default_mode": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["deep", "patterns", "graph"] },
+          "default": [],
+          "description": "기본 리서치 모드"
+        },
+        "auto_index": {
+          "type": "boolean",
+          "default": true,
+          "description": "자동 인덱싱 활성화"
+        }
+      }
+    },
+    "plan": {
+      "type": "object", 
+      "properties": {
+        "require_approval": {
+          "type": "boolean",
+          "default": true,
+          "description": "구현 전 승인 필수"
+        },
+        "min_review_score": {
+          "type": "number",
+          "default": 80,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "최소 AI 리뷰 점수"
+        }
+      }
+    },
+    "implement": {
+      "type": "object",
+      "properties": {
+        "default_parallel": {
+          "type": "boolean",
+          "default": false,
+          "description": "기본 병렬 실행"
+        },
+        "max_workers": {
+          "type": "number",
+          "default": 4,
+          "minimum": 1,
+          "maximum": 8,
+          "description": "최대 병렬 워커 수"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "default_focus": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["security", "performance"],
+          "description": "기본 리뷰 집중 영역"
+        },
+        "auto_fix": {
+          "type": "boolean",
+          "default": true,
+          "description": "자동 수정 활성화"
+        }
+      }
+    }
+  }
+}
+"""
+
+# 플러그인 훅 (선택사항)
+[hooks]
+pre_install = "scripts/pre-install.sh"
+post_install = "scripts/post-install.sh"
+pre_uninstall = "scripts/pre-uninstall.sh"
+
+# 의존성
+[dependencies]
+npm = [
+  "mermaid@^10.0.0",
+  "yaml@^2.0.0",
+  "chalk@^5.0.0",
+  "ora@^6.0.0",
+  "inquirer@^9.0.0"
+]
+
+# 플러그인 권한
+[permissions]
+file_system = "read_write"  # 파일 읽기/쓰기
+git = "read_write"          # Git 작업
+shell = "execute"           # 쉘 명령 실행
+network = "none"            # 네트워크 접근 불필요
+
+# 플러그인 메타데이터
+[metadata]
+readme = "README.md"
+changelog = "CHANGELOG.md"
+screenshots = [
+  "docs/images/workflow.png",
+  "docs/images/dashboard.png",
+  "docs/images/review-report.png"
+]
+
+# 지원 언어
+[i18n]
+default = "ko"
+supported = ["ko", "en"]
+
+# 플러그인 카테고리
+[marketplace]
+category = "Development Workflow"
+tags = ["methodology", "ai-assisted", "korean", "workflow", "automation"]
+featured = true
