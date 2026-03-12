@@ -20,6 +20,40 @@
 - [FAQ](#-faq)
 - [기여하기](#-기여하기)
 
+## 🧠 Smart Mode (NEW v2.1)
+
+**이제 옵션을 명시하지 않아도 됩니다!** 자연어로 요청하면 AI가 의도를 파악하여 자동으로 필요한 분석을 수행합니다.
+
+### 기존 방식 vs Smart Mode
+
+| 기존 방식 (v2.0) | Smart Mode (v2.1) |
+|-----------------|-------------------|
+| `/vibe-research "성능" --deep --graph` | `/vibe-research "로그인이 느려요"` |
+| 옵션을 알아야 함 | 자연어로 표현 |
+| 명시적 지정 필요 | AI가 자동 판단 |
+| 학습 곡선 있음 | 즉시 사용 가능 |
+
+### 작동 예시
+
+```bash
+# "느려요" → --deep (성능 분석) 자동 선택
+/vibe-research "로그인이 왜 이렇게 느려?"
+
+# "정리" → --patterns (코드 품질) 자동 선택  
+/vibe-research "이 코드 좀 정리해야 할 것 같아"
+
+# "전체" → 모든 옵션 자동 선택
+/vibe-research "결제 모듈 전체적으로 분석해줘"
+```
+
+### Smart Mode 신뢰도 시스템
+
+- **90% 이상**: 자동 실행
+- **70-90%**: 간단 확인 후 실행
+- **70% 미만**: 사용자에게 선택지 제공
+
+자세한 내용은 [Smart Mode 가이드](#smart-mode-상세-가이드)를 참조하세요.
+
 ## 🌟 핵심 철학
 
 ### 왜 Vibe Coding인가?
@@ -692,6 +726,76 @@ npm run test:perf  # 성능 테스트
 # 4. 보안 검증
 /vibe-review --focus security --strict
 # → 패치 효과 검증, 새로운 취약점 확인
+```
+
+## 🧠 Smart Mode 상세 가이드
+
+### 자연어 인식 패턴
+
+Smart Mode는 다양한 한국어/영어 표현을 이해합니다:
+
+#### 성능 관련 (→ --deep)
+- "느려요", "빨라요", "성능", "최적화"
+- "메모리 누수", "CPU 사용량"
+- "렌더링", "로딩 시간"
+
+#### 코드 품질 (→ --patterns)
+- "더러워", "지저분", "정리", "리팩토링"
+- "중복 코드", "안티패턴"
+- "코드 스멜", "개선"
+
+#### 구조 분석 (→ --graph)
+- "의존성", "구조", "관계"
+- "순환 참조", "모듈 간"
+- "영향 범위", "연결"
+
+### Smart Mode 설정
+
+`.vibe/smart-mode.yaml` 파일로 커스터마이징:
+
+```yaml
+smart_mode:
+  enabled: true
+  language: "ko"  # ko, en, auto
+  
+  # 자동 실행 임계값
+  auto_execute_threshold: 0.9
+  confirm_threshold: 0.7
+  
+  # 커스텀 키워드 추가
+  custom_keywords:
+    deep:
+      - "우리 서비스 느림"
+      - "고객 불만"
+    patterns:
+      - "코드 리뷰 전"
+      - "PR 올리기 전"
+      
+  # 프로젝트 컨텍스트
+  project_type: "frontend"  # frontend, backend, mobile
+  main_language: "typescript"
+```
+
+### 학습 시스템
+
+Smart Mode는 사용할수록 똑똑해집니다:
+
+1. **개인 학습**: 사용자의 선택 패턴 학습
+2. **팀 학습**: 팀원들의 패턴 공유
+3. **프로젝트 학습**: 프로젝트별 특성 반영
+
+### 명시적 옵션과 혼용
+
+필요시 명시적 옵션도 함께 사용 가능:
+
+```bash
+# Smart Mode + 명시적 옵션
+/vibe-research "성능 문제" --graph
+# → AI가 --deep 추가 판단, 최종: --deep --graph
+
+# Smart Mode 비활성화
+/vibe-research "분석" --manual --deep
+# → Smart Mode 무시, --deep만 사용
 ```
 
 ## 🚀 고급 기능
