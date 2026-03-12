@@ -1,21 +1,75 @@
 ---
 name: vibe-review
 description: |
-  Vibe Coding 4단계: 자동 코드 리뷰 (NEW). 구현 완료 후 보안, 성능, 품질을 종합적으로 리뷰하고 개선점을 제안한다.
+  Vibe Coding 4단계: 자동 코드 리뷰 (Auto-Detection). 요청 내용을 분석하여 필요한 리뷰 영역을 자동으로 활성화합니다.
   다음 상황에서 사용:
   (1) /vibe-implement 완료 후 코드 리뷰가 필요할 때
   (2) "코드 리뷰", "review", "vibe review" 등의 요청 시
   (3) PR 생성 전 사전 리뷰가 필요할 때
   (4) 보안/성능 취약점 스캔이 필요할 때
-argument-hint: '[--branch <브랜치>] [--focus <area>] [--pr-ready] [--auto-fix]'
+argument-hint: '"<리뷰할 코드 또는 초점 영역 설명>"'
 ---
 
-# Vibe Review (NEW)
+# Vibe Review (Auto-Detection)
 
-Vibe Coding 방법론의 **4단계: 자동 코드 리뷰** - AI 기반 종합 코드 품질 분석.
+Vibe Coding 방법론의 **4단계: 자동 코드 리뷰** - 요청 내용에 따라 자동으로 필요한 리뷰 영역에 집중합니다.
 
 구현 완료 후 코드의 보안, 성능, 유지보수성을 종합적으로 리뷰하고,
 실행 가능한 개선 제안과 함께 PR-ready 체크리스트를 제공한다.
+
+## 🤖 Auto-Detection System
+
+사용자 요청에 포함된 키워드를 자동으로 감지하여 적절한 리뷰 영역에 집중합니다:
+
+### 자동 옵션 활성화 규칙
+
+| 키워드 감지 | 자동 활성화 | 리뷰 초점 |
+|------------|------------|----------|
+| "보안", "취약점", "security", "vulnerability", "OWASP" | `--focus security` | 보안 취약점 심층 분석 |
+| "성능", "속도", "최적화", "performance", "slow" | `--focus performance` | 성능 병목 분석 |
+| "품질", "리팩토링", "quality", "clean", "SOLID" | `--focus quality` | 코드 품질 분석 |
+| "테스트", "커버리지", "test", "coverage" | `--focus testing` | 테스트 완성도 분석 |
+| "접근성", "a11y", "accessibility", "WCAG" | `--focus accessibility` | 접근성 검증 |
+| "PR", "풀리퀘스트", "머지", "pull request" | `--pr-ready` | PR 체크리스트 생성 |
+| "자동", "고치기", "fix", "auto" | `--auto-fix` | 자동 수정 가능한 이슈 처리 |
+| "엄격", "strict", "철저", "완벽" | `--strict` | 엄격한 기준 적용 |
+| "전체", "종합", "complete", "full" | 모든 영역 | 전체 심층 리뷰 |
+
+### 사용 예시
+
+```bash
+# "보안"이 포함되면 --focus security 자동 활성화
+/vibe-review "로그인 보안 취약점 확인"
+→ 자동으로 --focus security 활성화
+
+# "PR"이 포함되면 --pr-ready 자동 활성화
+/vibe-review "PR 올리기 전에 최종 체크"
+→ 자동으로 --pr-ready 활성화
+
+# "전체"가 포함되면 모든 영역 리뷰
+/vibe-review "전체적으로 코드 품질 종합 리뷰"
+→ 모든 리뷰 영역 활성화
+```
+
+### 컨텍스트 기반 자동 감지
+
+```yaml
+context_rules:
+  # 파일 확장자 기반
+  "*.test.ts": --focus testing
+  "*.spec.ts": --focus testing
+  "*.a11y.ts": --focus accessibility
+  
+  # 브랜치명 기반
+  "security/*": --focus security
+  "perf/*": --focus performance
+  "hotfix/*": --strict --auto-fix
+  
+  # 커밋 메시지 기반
+  "fix:": --auto-fix
+  "perf:": --focus performance
+  "security:": --focus security
+```
 
 ## Core Features
 

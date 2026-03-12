@@ -1,16 +1,16 @@
 ---
 name: vibe-plan
 description: |
-  Vibe Coding 2단계: 상세 구현 계획 수립 (Enhanced). 리서치 기반으로 plan.md를 작성하고, AI 기반 리뷰 및 리스크 평가를 수행한다.
+  Vibe Coding 2단계: 상세 구현 계획 수립 (Auto-Detection). 요청 내용을 분석하여 필요한 옵션을 자동으로 활성화합니다.
   다음 상황에서 사용:
   (1) /vibe-research 완료 후 구현 계획이 필요할 때
   (2) "계획 세워줘", "plan", "vibe plan" 등의 요청 시
-  (3) 기존 plan의 인라인 메모 피드백 반영 시 (--feedback)
-  (4) AI 리뷰 및 리스크 평가 필요 시 (--review)
-argument-hint: '[--research <파일명>] [--feedback] [--review] [--risk-analysis]'
+  (3) 기존 plan의 인라인 메모 피드백 반영 시
+  (4) AI 리뷰 및 리스크 평가 필요 시
+argument-hint: '[계획 요청 내용]'
 ---
 
-# Vibe Plan (Enhanced)
+# Vibe Plan (Auto-Detection)
 
 Vibe Coding 방법론의 **2단계: 상세 구현 계획 수립** + **AI 기반 리뷰 & 리스크 평가**.
 

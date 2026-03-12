@@ -1,21 +1,53 @@
 ---
 name: vibe-implement
 description: |
-  Vibe Coding 3단계: 기계적 구현 및 감독 (Enhanced). 승인된 plan.md 범위에서 병렬 구현, 실시간 검증, 자동 롤백을 수행한다.
+  Vibe Coding 3단계: 기계적 구현 및 감독 (Auto-Detection). 요청 내용을 분석하여 필요한 옵션을 자동으로 활성화합니다.
   다음 상황에서 사용:
   (1) /vibe-plan 승인 완료 후 구현 시작할 때
   (2) "구현해", "implement", "vibe implement" 등의 요청 시
   (3) Plan 범위 내 코드 변경을 순차적/병렬로 실행할 때
   (4) 실시간 검증 및 자동 롤백이 필요할 때
-argument-hint: '[--plan <파일명>] [--parallel] [--watch] [--rollback-on-fail]'
+argument-hint: '"<구현할 기능 또는 작업 설명>"'
 ---
 
-# Vibe Implement (Enhanced)
+# Vibe Implement (Auto-Detection)
 
-Vibe Coding 방법론의 **3단계: 기계적 구현 및 감독** - 병렬 실행과 자동 롤백 기능 강화 버전.
+Vibe Coding 방법론의 **3단계: 기계적 구현 및 감독** - 요청 내용에 따라 자동으로 필요한 실행 모드를 활성화합니다.
 
 승인된 plan.md 범위에서만 구현하고, 타입체크/테스트를 실시간으로 실행한다.
 계획 범위를 벗어나는 변경은 임의로 구현하지 않고 사용자에게 제안만 한다.
+
+## 🤖 Auto-Detection System
+
+사용자 요청에 포함된 키워드를 자동으로 감지하여 적절한 옵션을 활성화합니다:
+
+### 자동 옵션 활성화 규칙
+
+| 키워드 감지 | 자동 활성화 | 실행 모드 |
+|------------|------------|----------|
+| "병렬", "동시", "빠르게", "parallel", "concurrent" | `--parallel` | 병렬 실행 모드 |
+| "실시간", "모니터링", "watch", "감시", "관찰" | `--watch` | 실시간 감시 모드 |
+| "안전", "롤백", "복원", "실패", "rollback" | `--rollback-on-fail` | 자동 롤백 활성화 |
+| "테스트", "시뮬레이션", "dry", "미리보기" | `--dry-run` | 실제 변경 없이 시뮬레이션 |
+| "전체", "모든", "완전", "full" | 모든 안전 옵션 | watch + rollback |
+| "긴급", "핫픽스", "urgent", "hotfix" | `--fast` + `--skip-tests` | 빠른 실행 (주의) |
+| "점진적", "단계별", "incremental" | `--incremental` | 변경 부분만 구현 |
+
+### 사용 예시
+
+```bash
+# "병렬"이 포함되면 --parallel 자동 활성화
+/vibe-implement "로그인 기능 빠르게 구현"
+→ 자동으로 --parallel 활성화
+
+# "롤백"이 포함되면 --rollback-on-fail 자동 활성화  
+/vibe-implement "안전하게 구현하고 실패하면 롤백"
+→ 자동으로 --rollback-on-fail 활성화
+
+# "전체"가 포함되면 모든 안전 옵션 활성화
+/vibe-implement "전체 기능 완전하게 구현"
+→ 자동으로 --watch --rollback-on-fail 활성화
+```
 
 ## Enhanced Features
 
