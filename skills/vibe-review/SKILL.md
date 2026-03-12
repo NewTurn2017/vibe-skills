@@ -108,9 +108,15 @@ REVIEW_BRANCH=$(git branch --show-current)
 # 변경 파일 수집
 CHANGED_FILES=$(git diff --name-only main...$REVIEW_BRANCH)
 
-# 리뷰 디렉토리 준비
-mkdir -p .vibe/reviews
-REVIEW_FILE=".vibe/reviews/$(date +%Y%m%d-%H%M%S)-review.md"
+# 가장 최근 토픽 폴더 자동 탐지 (또는 --topic NNN_topic 지정)
+LATEST_TOPIC_DIR=$(fd -t d -d 1 '^[0-9]' .vibe 2>/dev/null | sort -r | head -1)
+
+# 리뷰 파일을 토픽 폴더 내에 저장
+REVIEW_FILE="${LATEST_TOPIC_DIR}review.md"
+
+# 같은 폴더의 research.md, plan.md를 자동 참조하여 리뷰 컨텍스트로 활용
+RESEARCH_FILE="${LATEST_TOPIC_DIR}research.md"
+PLAN_FILE="${LATEST_TOPIC_DIR}plan.md"
 ```
 
 ### Step 1: 리뷰 시작 선언
@@ -654,7 +660,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: review-report
-          path: .vibe/reviews/
+          path: .vibe/*/review.md
 ```
 
 ### Git Hooks

@@ -41,8 +41,8 @@ Vibe Coding 방법론의 **2단계: 상세 구현 계획 수립** + **AI 기반 
 
 ## Activation
 
-- `/vibe-plan` — 가장 최근 `.vibe/*.md` 리서치 파일 기반으로 계획 수립
-- `/vibe-plan --research 002_foo.md` — 특정 리서치 파일 지정
+- `/vibe-plan` — 가장 최근 `.vibe/NNN_topic/research.md` 기반으로 계획 수립
+- `/vibe-plan --research 002_foo` — 특정 토픽 폴더 지정 (`.vibe/002_foo/research.md`)
 - `/vibe-plan --feedback` — 기존 plan 파일의 인라인 메모 반영 루프
 - `/vibe-plan --review` — AI 기반 계획 리뷰 실행
 - `/vibe-plan --risk-analysis` — 상세 리스크 분석 포함
@@ -52,11 +52,15 @@ Vibe Coding 방법론의 **2단계: 상세 구현 계획 수립** + **AI 기반 
 ### Step 0: 리서치 파일 찾기 & 분석
 
 ```bash
-# 최신 리서치 파일 자동 탐지
-LATEST_RESEARCH=$(ls -t .vibe/*_research.md 2>/dev/null | head -1)
+# 최신 리서치 파일 자동 탐지 (토픽 폴더 내부의 research.md)
+LATEST_TOPIC_DIR=$(fd -t d -d 1 '^[0-9]' .vibe 2>/dev/null | sort -r | head -1)
+LATEST_RESEARCH="${LATEST_TOPIC_DIR}research.md"
+
+# 특정 리서치 지정 시: --research 002_foo → .vibe/002_foo/research.md
+# SPECIFIED_RESEARCH=".vibe/${TOPIC_NAME}/research.md"
 
 # 관련 리서치 파일들 연결 분석
-grep -h "## 🔗 관련 리서치" .vibe/*.md | cut -d' ' -f3-
+rg "## 🔗 관련 리서치" .vibe/*/research.md | cut -d' ' -f3-
 ```
 
 파일이 없으면: `먼저 /vibe-research "주제" 를 실행하세요.`
@@ -65,7 +69,7 @@ grep -h "## 🔗 관련 리서치" .vibe/*.md | cut -d' ' -f3-
 
 리서치 파일을 완전히 읽은 후 선언:
 ```
-리서치 파일을 읽었습니다: .vibe/NNN_topic.md
+리서치 파일을 읽었습니다: .vibe/NNN_topic/research.md
 
 📊 리서치 요약:
 - 분석 파일: N개
@@ -78,14 +82,17 @@ grep -h "## 🔗 관련 리서치" .vibe/*.md | cut -d' ' -f3-
 
 ### Step 2: Enhanced plan.md 작성
 
-**다음 인덱스**로 plan 파일 생성: `.vibe/NNN_topic_plan.md`
+**같은 토픽 폴더**에 plan 파일 생성: `.vibe/NNN_topic/plan.md`
+
+research.md가 있는 토픽 폴더를 찾아서 같은 폴더에 plan.md를 저장한다.
+새 토픽이면 폴더를 먼저 생성한다.
 
 각 섹션에 `<!-- MEMO: -->` 인라인 메모 공간 및 AI 평가를 포함:
 
 ```markdown
 # Plan: [주제]
 
-**기반 리서치**: .vibe/NNN_topic_research.md
+**기반 리서치**: .vibe/NNN_topic/research.md
 **생성일**: YYYY-MM-DD HH:MM
 **상태**: DRAFT (미승인 — 구현 금지)
 **승인 여부**: ☐ 미승인
@@ -501,9 +508,10 @@ Risk Score = (확률 × 영향도 × 노출도) / 완화 수준
 
 승인 완료 후 다음 명령으로 구현 시작:
 ```bash
-/vibe-implement --plan NNN_topic_plan.md
+/vibe-implement --plan NNN_topic
 ```
 
+vibe-implement는 `.vibe/NNN_topic/plan.md`를 자동으로 찾습니다.
 미승인 상태에서는 구현이 차단됩니다.
 ```
 

@@ -75,14 +75,19 @@ Vibe Coding 방법론의 **1단계: 심층 리서치** - 요청 내용에 따라
 # .vibe/ 디렉토리 없으면 생성
 mkdir -p .vibe
 
-# 다음 인덱스 번호 자동 계산 (기존 파일 수 + 1, 001부터 시작)
-NEXT_INDEX=$(printf "%03d" $(($(ls .vibe/*.md 2>/dev/null | wc -l) + 1)))
+# 다음 인덱스 번호 자동 계산 (기존 토픽 폴더 수 + 1, 001부터 시작)
+NEXT_INDEX=$(printf "%03d" $(($(fd -t d -d 1 --exclude reviews --exclude checkpoints . .vibe 2>/dev/null | wc -l) + 1)))
+
+# 토픽 폴더 생성
+TOPIC_DIR=".vibe/${NEXT_INDEX}_topic_in_english_snake_case"
+mkdir -p "$TOPIC_DIR"
 
 # 기존 리서치 문서 태그 분석
-grep -h "^#tags:" .vibe/*.md 2>/dev/null | sort | uniq
+rg "^#tags:" .vibe/*/research.md 2>/dev/null | sort | uniq
 ```
 
-파일명 규칙: `.vibe/NNN_topic_in_english_snake_case.md`
+폴더 규칙: `.vibe/NNN_topic_in_english_snake_case/`
+파일 규칙: `research.md` (리서치), `plan.md` (계획) — 토픽 폴더 내부에 저장
 
 ### Step 1: 분석 범위 선언 및 자동 모드 설정
 
@@ -91,7 +96,7 @@ grep -h "^#tags:" .vibe/*.md 2>/dev/null | sort | uniq
 리서치를 시작합니다. 코드 작성 없이 분석만 진행합니다.
 
 📋 주제: [사용자 입력 주제]
-📁 산출물: .vibe/NNN_topic.md
+📁 산출물: .vibe/NNN_topic/research.md
 
 🤖 자동 감지된 분석 모드:
   - [x] 기본 분석 (코드 구조, 플로우, 의존성)
@@ -121,7 +126,7 @@ ast-grep -p 'function $NAME($$$) { $$$ }' --lang tsx | \
 
 # 안티패턴 스캔
 rg "console\.(log|error)" --type ts --count
-rg "any" --type ts -A 2 -B 2 | grep -E "(: any|as any)"
+rg "any" --type ts -A 2 -B 2 | rg "(: any|as any)"
 ```
 
 #### 2.3 의존성 그래프 (--graph)
@@ -156,8 +161,8 @@ graph TD
 ---
 
 ## 🔗 관련 리서치
-- [001_authentication.md](001_authentication.md) - 인증 시스템 분석
-- [005_database_layer.md](005_database_layer.md) - DB 레이어 분석
+- [001_authentication/research.md](../001_authentication/research.md) - 인증 시스템 분석
+- [005_database_layer/research.md](../005_database_layer/research.md) - DB 레이어 분석
 
 ---
 
@@ -342,7 +347,7 @@ graph LR
 **필수 준수 사항:**
 - 모든 참조는 `파일경로:라인번호` 형식
 - 불확실한 부분은 숨기지 말고 명시
-- 인덱스 번호는 항상 3자리 (001, 002, ...)
+- 인덱스 번호는 항상 3자리 (001, 002, ...) — 토픽 폴더명에 사용
 - 메트릭스와 통계 데이터 포함
 - 시각적 다이어그램 활용 (mermaid)
 - 태그 시스템으로 분류
