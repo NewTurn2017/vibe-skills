@@ -1,0 +1,48 @@
+{
+  "skill_name": "vibe",
+  "status": "complete",
+  "current_experiment": 3,
+  "baseline_score": 88.0,
+  "best_score": 100.0,
+  "experiments": [
+    {
+      "id": 0,
+      "score": 22,
+      "max_score": 25,
+      "pass_rate": 88.0,
+      "status": "baseline",
+      "description": "original unified skill — no changes"
+    },
+    {
+      "id": 1,
+      "score": 24,
+      "max_score": 25,
+      "pass_rate": 96.0,
+      "status": "keep",
+      "description": "added Multi-Phase Execution section with disambiguation and output template"
+    },
+    {
+      "id": 2,
+      "score": 25,
+      "max_score": 25,
+      "pass_rate": 100.0,
+      "status": "keep",
+      "description": "added error handling for missing research.md in Plan workflow"
+    },
+    {
+      "id": 3,
+      "score": 25,
+      "max_score": 25,
+      "pass_rate": 100.0,
+      "status": "discard",
+      "description": "tried adding missing plan.md error handling to Implement — no score improvement"
+    }
+  ],
+  "eval_breakdown": [
+    {"name": "Phase Detection", "pass_count": 19, "total": 20},
+    {"name": "Output Structure", "pass_count": 19, "total": 20},
+    {"name": "Critical Rules", "pass_count": 20, "total": 20},
+    {"name": ".vibe Convention", "pass_count": 18, "total": 20},
+    {"name": "Next Step", "pass_count": 20, "total": 20}
+  ]
+}

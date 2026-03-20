@@ -1,0 +1,18 @@
+{
+  "skill_name": "vibe-review",
+  "status": "complete",
+  "current_experiment": 1,
+  "baseline_score": 80.0,
+  "best_score": 100.0,
+  "experiments": [
+    {"id": 0, "score": 20, "max_score": 25, "pass_rate": 80.0, "status": "baseline", "description": "original skill — no changes"},
+    {"id": 1, "score": 25, "max_score": 25, "pass_rate": 100.0, "status": "keep", "description": "replaced TypeScript pseudocode scan functions with real rg/ast-grep OWASP commands"}
+  ],
+  "eval_breakdown": [
+    {"name": "Focus Detection", "pass_count": 10, "total": 10},
+    {"name": "Multi-dimensional", "pass_count": 10, "total": 10},
+    {"name": "Actionable Fixes", "pass_count": 10, "total": 10},
+    {"name": "PR Checklist", "pass_count": 10, "total": 10},
+    {"name": "Real Tool Commands", "pass_count": 5, "total": 10}
+  ]
+}

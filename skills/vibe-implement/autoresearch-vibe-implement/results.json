@@ -1,0 +1,18 @@
+{
+  "skill_name": "vibe-implement",
+  "status": "complete",
+  "current_experiment": 1,
+  "baseline_score": 80.0,
+  "best_score": 100.0,
+  "experiments": [
+    {"id": 0, "score": 20, "max_score": 25, "pass_rate": 80.0, "status": "baseline", "description": "original skill — no changes"},
+    {"id": 1, "score": 25, "max_score": 25, "pass_rate": 100.0, "status": "keep", "description": "replaced bash while-loop pseudocode with 4-tier actionable validation commands"}
+  ],
+  "eval_breakdown": [
+    {"name": "Pre-Gate Check", "pass_count": 10, "total": 10},
+    {"name": "Execution Order", "pass_count": 10, "total": 10},
+    {"name": "Validation Commands", "pass_count": 5, "total": 10},
+    {"name": "Out-of-Scope Handling", "pass_count": 10, "total": 10},
+    {"name": "Completion Report", "pass_count": 10, "total": 10}
+  ]
+}

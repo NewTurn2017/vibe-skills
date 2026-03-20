@@ -220,24 +220,27 @@ for (const group of groups) {
 ### Step 4: 실시간 검증 시스템
 
 #### 4.1 Continuous Validation
-
-**각 파일 변경 후 즉시 실행하는 검증 명령어 (프로젝트에 맞게 적응):**
-
 ```bash
-# Tier 1: 타입체크 (매 파일 변경 후, ~5초)
-tsc --noEmit --skipLibCheck
-
-# Tier 2: 린트 (변경 파일만)
-npx eslint [변경된_파일_경로] --no-warn-ignored
-
-# Tier 3: 관련 테스트 (변경 파일에 매칭되는 테스트)
-npx jest --findRelatedTests [변경된_파일_경로] --passWithNoTests
-
-# Tier 4: 풀 빌드 (각 Group 완료 후)
-npm run build --if-present || next build --no-lint
+# 백그라운드 검증 프로세스
+while true; do
+  # 타입체크
+  npm run typecheck --silent
+  TYPE_STATUS=$?
+  
+  # 린트
+  npm run lint --silent
+  LINT_STATUS=$?
+  
+  # 테스트 (변경된 파일만)
+  npm run test:changed --silent
+  TEST_STATUS=$?
+  
+  # 상태 업데이트
+  update_dashboard $TYPE_STATUS $LINT_STATUS $TEST_STATUS
+  
+  sleep 5
+done &
 ```
-
-**적응 원칙:** 프로젝트의 `package.json` scripts를 먼저 확인하여 실제 사용 가능한 명령어를 파악한다. 위 명령어가 없으면 프로젝트에 존재하는 대체 명령어를 사용한다. 명령어가 실패하면 에러를 분석하고 수정한 뒤 재검증한다.
 
 #### 4.2 실시간 대시보드
 ```

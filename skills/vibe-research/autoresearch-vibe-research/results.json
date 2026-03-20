@@ -1,0 +1,48 @@
+{
+  "skill_name": "vibe-research",
+  "status": "complete",
+  "current_experiment": 3,
+  "baseline_score": 80.0,
+  "best_score": 100.0,
+  "experiments": [
+    {
+      "id": 0,
+      "score": 20,
+      "max_score": 25,
+      "pass_rate": 80.0,
+      "status": "baseline",
+      "description": "original vibe-research skill — no changes"
+    },
+    {
+      "id": 1,
+      "score": 25,
+      "max_score": 25,
+      "pass_rate": 100.0,
+      "status": "keep",
+      "description": "replaced generic tool examples with topic-adaptive guidance and adaptation principles"
+    },
+    {
+      "id": 2,
+      "score": 25,
+      "max_score": 25,
+      "pass_rate": 100.0,
+      "status": "discard",
+      "description": "tried adding cross-reference auto-discovery — no score improvement"
+    },
+    {
+      "id": 3,
+      "score": 25,
+      "max_score": 25,
+      "pass_rate": 100.0,
+      "status": "discard",
+      "description": "considered emoji removal simplification — skipped, no eval impact"
+    }
+  ],
+  "eval_breakdown": [
+    {"name": "Auto-Detection", "pass_count": 20, "total": 20},
+    {"name": "Template Completeness", "pass_count": 20, "total": 20},
+    {"name": "Depth Enforcement", "pass_count": 20, "total": 20},
+    {"name": "Tool Usage Guidance", "pass_count": 15, "total": 20},
+    {"name": "Index & Path Mgmt", "pass_count": 20, "total": 20}
+  ]
+}

@@ -1,0 +1,516 @@
+---
+name: vibe
+description: |
+  Vibe Coding - AI-driven development workflow with auto phase detection.
+  Analyzes user intent and automatically selects the right phase: Research, Plan, Implement, or Review.
+  Use when: "vibe", "분석", "계획", "구현", "리뷰", "analyze", "plan", "implement", "review", "build", "check code".
+  Single unified command replaces vibe-research, vibe-plan, vibe-implement, vibe-review.
+argument-hint: '"<요청 내용>"'
+---
+
+# Vibe - AI Development Workflow
+
+Single command, four phases. Analyzes your request and runs the right phase automatically.
+
+Pipeline: **Research** (understand) -> **Plan** (decide) -> **Implement** (build) -> **Review** (verify)
+
+No code is written until Phase 3. No implementation starts without an approved plan.
+
+---
+
+## Phase Auto-Detection
+
+Analyze the user's input and select ONE phase. If ambiguous, ask the user.
+
+| Keywords | Phase | What Happens |
+|----------|-------|-------------|
+| 분석, 리서치, 조사, 구조, 의존성, 파악, research, analyze, investigate, explore | **Research** | Deep codebase analysis, no code changes |
+| 계획, 플랜, 설계, plan, design, 세워줘, 전략 | **Plan** | Implementation plan with risk assessment |
+| 구현, 만들어, 빌드, implement, build, code, 실행, 적용 | **Implement** | Code changes following approved plan |
+| 리뷰, 검토, 코드리뷰, review, check, audit, 보안, PR | **Review** | Code quality, security, performance review |
+
+When multiple phases are requested (e.g., "분석하고 계획까지"), execute them sequentially and output results for each.
+
+### Sub-option Auto-Detection
+
+Within each phase, keywords activate specialized modes:
+
+**Research options:**
+| Keyword | Mode | Focus |
+|---------|------|-------|
+| 성능, 속도, 최적화, 메모리 | --deep | Performance profiling, complexity analysis |
+| 패턴, 중복, 리팩토링, SOLID | --patterns | Anti-pattern detection, code smells |
+| 의존성, 구조, 모듈, 순환 | --graph | Dependency graph, impact scope |
+| 전체, 종합, 완전 | all modes | Complete analysis |
+
+**Plan options:**
+| Keyword | Mode | Focus |
+|---------|------|-------|
+| 피드백, 수정, 반영 | --feedback | Integrate inline MEMO comments |
+| 리뷰, 평가, 검토 | --review | AI plan review and scoring |
+| 리스크, 위험, 안전 | --risk-analysis | Detailed risk simulation |
+
+**Implement options:**
+| Keyword | Mode | Focus |
+|---------|------|-------|
+| 병렬, 동시, 빠르게 | --parallel | Parallel execution by dependency group |
+| 안전, 롤백, 복원 | --rollback-on-fail | Auto-rollback on failure |
+| 테스트, 시뮬레이션 | --dry-run | Preview changes without writing |
+| 긴급, 핫픽스 | --fast | Minimal verification (use with caution) |
+
+**Review options:**
+| Keyword | Mode | Focus |
+|---------|------|-------|
+| 보안, 취약점, OWASP | --focus security | OWASP Top 10, auth/authz audit |
+| 성능, 최적화 | --focus performance | Big O, re-renders, N+1, bundle size |
+| 품질, 클린, SOLID | --focus quality | Code smells, duplication, patterns |
+| PR, 머지, 풀리퀘스트 | --pr-ready | PR checklist and description |
+| 엄격, strict | --strict | Zero tolerance for issues |
+
+---
+
+## .vibe Directory Convention
+
+All artifacts live in `.vibe/` at the project root. Each topic gets a numbered folder.
+
+```
+.vibe/
+  001_authentication/
+    research.md    <- Phase 1 output
+    plan.md        <- Phase 2 output
+    review.md      <- Phase 4 output
+  002_payment/
+    research.md
+    plan.md
+    ...
+```
+
+**Indexing rules:**
+- Folder format: `NNN_topic_in_english_snake_case` (3-digit zero-padded)
+- Next index: count existing topic folders + 1
+- Files: `research.md`, `plan.md`, `review.md` inside each topic folder
+- Tags in each file for cross-referencing: `#tags: auth, security, ...`
+
+```bash
+# Auto-calculate next index
+NEXT_INDEX=$(printf "%03d" $(($(fd -t d -d 1 --exclude reviews --exclude checkpoints . .vibe 2>/dev/null | wc -l) + 1)))
+TOPIC_DIR=".vibe/${NEXT_INDEX}_topic_name"
+mkdir -p "$TOPIC_DIR"
+```
+
+---
+
+## Phase 1: Research
+
+**Goal:** Deeply analyze the codebase. Produce a reusable research document. Write ZERO code.
+
+### Workflow
+
+1. **Setup** - Create `.vibe/NNN_topic/` folder, calculate index
+2. **Declare scope** - State the topic, activated modes, and output path
+3. **Analyze** - Read all relevant code with exact file:line references
+4. **Write research.md** - Extremely detailed, never summarize shallowly
+
+### Declare
+
+```
+Research를 시작합니다. 코드 변경 없이 분석만 진행합니다.
+
+Topic: [주제]
+Output: .vibe/NNN_topic/research.md
+Modes: [기본 | deep | patterns | graph]
+Detected keywords: [...]
+```
+
+### research.md Structure
+
+```markdown
+# Research: [주제]
+
+**Date**: YYYY-MM-DD HH:MM
+**Index**: NNN
+**Status**: research-only
+**Modes**: [activated modes]
+**Tags**: #tag1 #tag2
+
+---
+
+## Related Research
+- [NNN_other_topic](../NNN_other_topic/research.md) - description
+
+## 1. File/Function/Type Map
+| File Path | Role | Complexity | Change Risk |
+|-----------|------|-----------|-------------|
+| src/path:lines | description | Low/Med/High | Low/Med/High |
+
+## 2. Current Flow
+[mermaid sequence diagram: trigger -> process -> output]
+
+## 3. Data Flow
+- Input sources, validation, transformations
+- State management, storage, external APIs
+
+## 4. Dependencies & Side Effects
+[mermaid dependency graph]
+
+## 5. Pattern Analysis (--patterns)
+| Pattern | Location | Frequency | Action |
+|---------|----------|-----------|--------|
+[Anti-patterns, code smells, duplication]
+
+## 6. Performance Analysis (--deep)
+| Function | Time | Space | Optimizable |
+|----------|------|-------|------------|
+[Big O, bottlenecks, N+1, memory leaks]
+
+## 7. Risk & Impact Scope
+| Risk | Severity | Scope | Action |
+|------|----------|-------|--------|
+[Security, breaking changes, blast radius]
+
+## 8. Unknowns & Questions
+- [ ] Items requiring user confirmation
+
+## 9. Metrics
+[File count, line count, test coverage, complexity stats]
+
+## 10. Summary & Next Steps
+- Key findings (numbered)
+- Immediate actions needed
+- **Next: `/vibe "계획 세워줘"` to create implementation plan**
+```
+
+### Analysis Tools
+- `ast-grep` (sg): Structural code pattern search
+- `rg` (ripgrep): Fast text search
+- `fd`: File discovery
+- `tokei`: Code statistics
+
+---
+
+## Phase 2: Plan
+
+**Goal:** Create a detailed implementation plan. Write ZERO code. Developer approves before any implementation.
+
+### Workflow
+
+1. **Find research** - Locate latest `.vibe/NNN_topic/research.md` (or specified)
+2. **Read & confirm** - Fully read research, state summary
+3. **Write plan.md** - Detailed plan with MEMO spaces and AI review
+4. **Get approval** - Plan stays DRAFT until explicitly approved
+
+### plan.md Structure
+
+```markdown
+# Plan: [주제]
+
+**Based on**: .vibe/NNN_topic/research.md
+**Date**: YYYY-MM-DD HH:MM
+**Status**: DRAFT (미승인 - 구현 금지)
+**Approval**: [ ] 미승인
+**Risk Level**: [Low/Medium/High/Critical]
+**Estimated Time**: [N hours/days]
+
+---
+
+## 0. Goals & Non-Goals
+### Goals
+- [ ] [Specific, measurable goal]
+### Non-Goals
+- [Explicitly excluded items]
+<!-- MEMO: -->
+
+## 1. File Changes
+### New Files
+| Path | Purpose | Est. Lines | Priority |
+### Modified Files
+| Path | Change Type | Impact | Risk |
+### Deleted Files
+| Path | Reason | Dependencies Checked |
+<!-- MEMO: -->
+
+## 2. Per-File Change Details
+### path/to/file.ts
+**Before:** [current code snippet]
+**After:** [planned code change]
+**Reason:** [why this change]
+<!-- MEMO: -->
+
+## 3. Type/Interface Changes
+[Breaking vs backward-compatible changes with code examples]
+<!-- MEMO: -->
+
+## 4. Implementation Strategy
+[mermaid graph of phase order]
+### Phase N: [Name] (time estimate)
+- [ ] Task items
+<!-- MEMO: -->
+
+## 5. Migration & Compatibility
+[Strategy, compatibility matrix, breaking change notices]
+<!-- MEMO: -->
+
+## 6. Test Strategy
+| Type | Current | Target | New Tests |
+[Test scenarios: happy path, errors, edge cases]
+<!-- MEMO: -->
+
+## 7. Rollback Strategy
+[Triggers, procedure, complexity assessment]
+<!-- MEMO: -->
+
+## 8. Alternatives & Tradeoffs
+[Considered alternatives with pros/cons comparison table]
+<!-- MEMO: -->
+
+## 9. Risk Analysis
+| Risk | Probability | Impact | Level | Mitigation |
+[Risk score calculation, contingency plans]
+<!-- MEMO: -->
+
+## 10. Key Decision Questions
+- [ ] **Q1**: [Decision needed]
+<!-- MEMO: -->
+
+## 11. AI Review Report
+[Completeness score, missing elements, improvement suggestions, alternative approaches]
+
+## Approval Checklist
+- [ ] Research up to date
+- [ ] Goals/non-goals clear
+- [ ] File paths confirmed
+- [ ] Test strategy confirmed
+- [ ] Rollback strategy confirmed
+- [ ] Risk level acceptable
+- [ ] AI review score > 80
+- [ ] **Developer final approval**: [ ]
+
+**Next: After approval, run `/vibe "구현해"` to start implementation**
+```
+
+### --feedback Mode
+Extracts all `<!-- MEMO: comments -->` from existing plan.md and updates the plan accordingly.
+
+### --review Mode
+AI evaluates the plan: completeness score, missing considerations, risk assessment.
+
+---
+
+## Phase 3: Implement
+
+**Goal:** Execute the approved plan mechanically. Stay within plan scope. Verify continuously.
+
+### Pre-Implementation Gate
+
+Automatically checks plan approval status:
+```bash
+LATEST_TOPIC_DIR=$(fd -t d -d 1 '^[0-9]' .vibe 2>/dev/null | sort -r | head -1)
+rg "Developer final approval.*\[x\]" "${LATEST_TOPIC_DIR}/plan.md"
+```
+
+If not approved: block implementation, show missing checklist items.
+
+### Workflow
+
+1. **Verify approval** - Check plan.md approval status
+2. **Create branch** - `git checkout -b vibe-impl-YYYYMMDD-HHMMSS`
+3. **Analyze dependencies** - Build execution groups from plan
+4. **Implement by group** - Sequential or parallel, with checkpoints
+5. **Validate continuously** - Type check + lint + test after each file
+6. **Report completion** - Summary with metrics and next steps
+
+### Declare
+
+```
+Implementation을 시작합니다.
+
+Plan: .vibe/NNN_topic/plan.md
+Research: .vibe/NNN_topic/research.md (auto-referenced)
+Files: N개
+Risk Level: [level]
+Mode: [Sequential | Parallel]
+Safety: [typecheck: on | rollback: on/off | watch: on/off]
+```
+
+### Execution Groups
+
+Classify files by dependency order:
+```
+Group 1 (parallel OK): types, constants, config
+Group 2 (after G1):    utilities, helpers
+Group 3 (after G2):    core logic, API routes
+Group 4 (after G3):    components, pages
+Group 5 (after G4):    tests, docs
+```
+
+### Continuous Validation
+
+After each file change:
+1. `tsc --noEmit` (type check)
+2. Lint check
+3. Related tests
+
+After each group:
+1. Full type check
+2. Full test suite
+3. Create checkpoint: `git add -A && git commit -m "checkpoint: group N complete"`
+
+### Out-of-Scope Changes
+
+When discovering needed changes outside plan scope:
+```
+Plan 범위 외 변경 감지
+
+Location: [file:line]
+Issue: [description]
+Severity: [Low/Medium/High/Critical]
+
+Options:
+A) Emergency patch (implement + update plan)
+B) Add TODO comment (defer)
+C) Stop implementation (re-plan)
+D) Separate hotfix branch
+```
+
+Only option A for Critical security issues. Otherwise, ask the user.
+
+### Completion Report
+
+```
+Implementation 완료!
+
+Changes: N files, +X/-Y lines
+Validation: typecheck [pass/fail] | lint [pass/fail] | tests [pass/fail]
+Coverage: X% (+N%)
+Out-of-scope items: [list if any]
+
+Branch: vibe-impl-YYYYMMDD-HHMMSS
+**Next: `/vibe "코드 리뷰"` to review changes**
+```
+
+### Rollback Protocol (--rollback-on-fail)
+
+Triggers: build failure, >5 type errors, >10% test failure rate, security vulnerability.
+Action: revert to last checkpoint, log failure reason.
+
+---
+
+## Phase 4: Review
+
+**Goal:** Comprehensive code review across security, performance, quality, and test coverage.
+
+### Workflow
+
+1. **Collect changes** - `git diff main...HEAD`, load .vibe/ context
+2. **Declare scope** - State review range, focus areas, activated modes
+3. **Multi-dimensional analysis** - Security, performance, quality, tests
+4. **Generate report** - review.md with actionable items and PR readiness
+5. **Auto-fix** (if --auto-fix) - Apply fixable issues automatically
+
+### Declare
+
+```
+Code Review를 시작합니다.
+
+Branch: [current branch]
+Changed files: N개
+Lines: +X/-Y
+Focus: [security, performance, quality, testing, all]
+Mode: [standard | strict | pr-ready]
+```
+
+### review.md Structure
+
+```markdown
+# Code Review Report
+
+**Date**: YYYY-MM-DD HH:MM
+**Branch**: [branch name]
+**Overall Score**: XX/100
+
+---
+
+## Executive Summary
+### Strengths
+- [Good patterns found]
+### Issues
+- [Critical/High/Medium items count]
+
+## Security Analysis
+### [Critical/High/Medium/Low] Issues
+For each issue:
+- **File**: path:line
+- **Issue**: description
+- **Fix**: code example (before/after)
+
+## Performance Analysis
+### Optimization Opportunities
+For each:
+- **Location**: path:line
+- **Impact**: High/Medium/Low
+- **Fix**: code example
+
+## Code Quality
+- Maintainability score
+- SOLID compliance check
+- Code smells and duplication
+- Design pattern suggestions
+
+## Test Coverage
+| Type | Coverage | Target | Gap |
+[Uncovered critical paths listed]
+
+## PR Readiness Checklist
+### Must Fix (blocks PR)
+- [ ] [Critical items]
+### Should Fix
+- [ ] [Important items]
+### Nice to Have
+- [ ] [Improvements]
+
+## Action Items (Prioritized)
+1. **P0 Security**: [immediate fixes]
+2. **P1 Performance**: [this sprint]
+3. **P2 Quality**: [tech debt backlog]
+
+**Next: Fix issues, then create PR or run `/vibe "리뷰"` again to verify**
+```
+
+### --pr-ready Mode
+Generates a complete PR description with summary, changes, metrics, breaking changes, and test instructions.
+
+### --strict Mode
+Zero tolerance: coverage > 90%, no security issues, zero lint errors.
+
+### --auto-fix Mode
+Automatically applies fixable issues (lint, formatting, simple patterns). Logs all changes.
+
+---
+
+## Critical Rules
+
+### All Phases
+- Reference code with exact `file_path:line_number` format
+- Surface unknowns explicitly - never hide uncertainty
+- Use mermaid diagrams for flows and dependencies
+- Use Rust CLI tools: `rg`, `fd`, `ast-grep`, `bat`, `eza`, `tokei`
+- Always state the detected phase and activated options at the start
+- Always indicate the next step/command at the end
+
+### Phase-Specific Prohibitions
+
+| Phase | NEVER Do |
+|-------|----------|
+| Research | Write or modify any code files |
+| Plan | Write code before explicit developer approval |
+| Implement | Change anything outside the approved plan scope without asking |
+| Review | Ignore Critical security issues or approve without tests |
+
+### Quality Gates
+
+| Phase | Gate |
+|-------|------|
+| Research | All references must be verifiable file:line paths |
+| Plan | AI review score > 80, all key questions answered |
+| Implement | Type check pass, tests pass, zero security vulnerabilities |
+| Review | All Critical/High issues documented with fix examples |

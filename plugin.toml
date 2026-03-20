@@ -17,6 +17,14 @@ node_version = ">=18.0.0"
 
 # 스킬 정의
 [[skills]]
+name = "vibe"
+description = "AI-driven development workflow - unified 4-phase command (Research/Plan/Implement/Review)"
+entry = "skills/vibe/index.js"
+arguments = [
+  { name = "request", type = "string", required = true, description = "요청 내용 (phase auto-detection)" }
+]
+
+[[skills]]
 name = "vibe-research"
 description = "코드베이스 심층 분석 및 문서화"
 entry = "skills/vibe-research/index.js"
