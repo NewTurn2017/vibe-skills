@@ -21,7 +21,9 @@ name = "vibe"
 description = "AI-driven development workflow - unified 4-phase command (Research/Plan/Implement/Review)"
 entry = "skills/vibe/index.js"
 arguments = [
-  { name = "request", type = "string", required = true, description = "요청 내용 (phase auto-detection)" }
+  { name = "request", type = "string", required = true, description = "요청 내용 (phase auto-detection)" },
+  { name = "--team", type = "boolean", default = false, description = "강제 team 모드 활성화" },
+  { name = "--solo", type = "boolean", default = false, description = "강제 single 모드 (team 비활성화)" }
 ]
 
 [[skills]]
