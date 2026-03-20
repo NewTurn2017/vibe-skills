@@ -2,7 +2,7 @@
 
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blue)](https://code.claude.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/NewTurn2017/vibe-skills)
+[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](https://github.com/NewTurn2017/vibe-skills)
 
 **Vibe Coding**은 AI와 개발자가 협업하는 체계적인 개발 방법론입니다. 계획과 실행을 명확히 분리하여 개발자가 아키텍처 주도권을 유지하면서 AI의 생산성을 극대화합니다.
 
@@ -10,11 +10,13 @@
 
 - [핵심 철학](#-핵심-철학)
 - [설치 방법](#-설치-방법)
+- [사전 요구사항](#-사전-요구사항)
 - [4단계 워크플로우](#-4단계-워크플로우)
   - [1. vibe-research (리서치)](#1-vibe-research---심층-리서치)
   - [2. vibe-plan (계획)](#2-vibe-plan---구현-계획)
   - [3. vibe-implement (구현)](#3-vibe-implement---기계적-구현)
   - [4. vibe-review (리뷰)](#4-vibe-review---자동-코드-리뷰)
+- [Team Mode (NEW v2.1)](#-team-mode-new-v21)
 - [사용 예제](#-사용-예제)
 - [고급 기능](#-고급-기능)
 - [FAQ](#-faq)
@@ -100,6 +102,50 @@ cd ~/.claude/plugins/vibe-skills
 # Claude Code에서 다음 명령어로 확인
 /vibe-research --help
 ```
+
+## 📌 사전 요구사항
+
+### 기본 (Single Mode)
+
+별도 의존성 없이 바로 사용 가능합니다.
+
+아래 CLI 도구들이 설치되어 있으면 더 정확한 분석이 가능합니다 (선택사항):
+
+| 도구 | 용도 | 설치 |
+|------|------|------|
+| [ripgrep](https://github.com/BurntSushi/ripgrep) (`rg`) | 고속 텍스트 검색 | `brew install ripgrep` |
+| [fd](https://github.com/sharkdp/fd) | 파일 탐색 | `brew install fd` |
+| [ast-grep](https://github.com/ast-grep/ast-grep) (`sg`) | 구조적 코드 패턴 검색 | `brew install ast-grep` |
+| [tokei](https://github.com/XAMPPRocky/tokei) | 코드 통계 | `brew install tokei` |
+
+### Team Mode (병렬 에이전트 실행)
+
+Team Mode는 [oh-my-claudecode (omc)](https://github.com/nicobailey-omc/oh-my-claudecode) 플러그인의 에이전트 인프라를 사용합니다.
+
+**필수:**
+- [oh-my-claudecode](https://github.com/nicobailey-omc/oh-my-claudecode) — omc 플러그인 설치 및 설정 완료
+  ```bash
+  # omc 설치 (Claude Code에서)
+  /install-plugin oh-my-claudecode
+  ```
+
+**사용되는 omc 에이전트:**
+
+| 에이전트 | 모델 | 역할 |
+|---------|------|------|
+| `explore` | haiku | 코드베이스 구조 탐색 |
+| `analyst` | opus | 성능/패턴 분석 |
+| `architect` | opus | 아키텍처/의존성 분석 |
+| `planner` | opus | 구현 전략 수립 |
+| `critic` | opus | 계획 도전/리스크 분석 |
+| `executor` | sonnet | 코드 구현 |
+| `designer` | sonnet | UI 컴포넌트 작업 |
+| `test-engineer` | sonnet | 테스트 작성 |
+| `code-reviewer` | opus | 코드 품질 리뷰 |
+| `security-reviewer` | sonnet | 보안 취약점 스캔 |
+| `verifier` | sonnet | 테스트/빌드 검증 |
+
+> **Note**: omc가 설치되지 않은 환경에서는 Team Mode가 비활성화되고 기존 Single Mode로 동작합니다.
 
 ## 🔄 4단계 워크플로우
 
@@ -618,6 +664,91 @@ npm run test:perf  # 성능 테스트
 - 자동 수정: 23개
 - 수동 필요: 2개
 - 소요 시간: 8초
+```
+
+## 🤖 Team Mode (NEW v2.1)
+
+복잡한 작업을 여러 전문 에이전트가 동시에 처리합니다. AI가 자동으로 복잡도를 판단하여 Single/Team 모드를 선택합니다.
+
+### 자동 감지 기준
+
+| Phase | Team Mode 활성화 조건 | Single Mode |
+|-------|---------------------|-------------|
+| Research | 분석 옵션 2개 이상 또는 `전체` 키워드 | 옵션 0-1개 |
+| Plan | 다중 모듈 범위 또는 `--review` + `--risk-analysis` | 단일 모듈 |
+| Implement | 변경 파일 6개 이상 또는 `team` 키워드 | 5개 이하 |
+| Review | 다중 focus 또는 `--strict` | 단일 focus |
+
+### 사용법
+
+```bash
+# 자동 감지 — "전체"가 포함되어 team 모드 자동 활성화
+/vibe "인증 시스템 전체 분석"
+
+# 명시적 team 모드
+/vibe "team 결제 모듈 구현"
+
+# 에이전트 수/타입 직접 지정 (Implement phase)
+/vibe "team 5:executor 인증 시스템 구현"
+
+# 강제 single 모드 (team 비활성화)
+/vibe "solo 로그인 분석"
+```
+
+### Team Mode 키워드
+
+| 키워드 | 효과 |
+|--------|------|
+| `team`, `팀` | 강제 team 모드 |
+| `solo`, `싱글`, `단독` | 강제 single 모드 |
+| `N:agent-type` (예: `3:executor`) | team 모드 + Implement 워커 지정 |
+
+> **Note**: `병렬`, `동시`, `parallel`은 기존 `--parallel` 옵션 트리거로 유지됩니다 (team 모드와 별개).
+
+### 작동 방식
+
+```
+TeamCreate("vibe-NNN")
+  ├─ Research: explore + analyst + architect (병렬 분석)
+  ├─ Plan: planner → architect + critic (순차+병렬 리뷰)
+  ├─ Implement: executor x N (그룹별 병렬 구현)
+  └─ Review: code-reviewer + security-reviewer + verifier (병렬 리뷰)
+TeamDelete()
+```
+
+- 세션당 1개 team 생성, phase 간 워커 로테이션
+- 각 phase 결과는 `.vibe/NNN_topic/` 에 기존과 동일하게 저장
+- Plan → Implement 전환 시 사용자 승인 게이트 유지
+
+### Team Mode 예제
+
+```bash
+# 시나리오: 대규모 리팩토링
+# 1. 전체 분석 (team 자동 활성화 — 옵션 3개)
+/vibe "인증 모듈 전체 분석"
+#   → explore: 파일/함수 맵
+#   → analyst: 성능/패턴 분석
+#   → architect: 의존성 그래프
+#   → Lead: 결과 통합 → .vibe/001_auth/research.md
+
+# 2. 계획 (team 자동 — 다중 모듈)
+/vibe "계획 세워줘"
+#   → planner: 구현 전략
+#   → architect + critic: 병렬 리뷰
+#   → Lead: 통합 → .vibe/001_auth/plan.md
+
+# 3. 구현 (team 자동 — 파일 15개)
+/vibe "구현해"
+#   → executor x 4: 그룹별 병렬 구현
+#   → test-engineer: 테스트 작성
+#   → Lead: 커밋 조율
+
+# 4. 리뷰 (team 자동 — strict)
+/vibe "strict 리뷰"
+#   → code-reviewer: 품질/SOLID
+#   → security-reviewer: OWASP Top 10
+#   → verifier: 테스트/빌드 검증
+#   → Lead: 통합 → .vibe/001_auth/review.md
 ```
 
 ## 🎬 사용 예제
