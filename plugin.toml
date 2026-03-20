@@ -6,7 +6,7 @@ name = "vibe-skills"
 version = "2.0.0"
 description = "AI 주도 개발 방법론 - 체계적인 4단계 워크플로우 (리서치→계획→구현→리뷰)"
 author = "Jaehyun Jang"
-homepage = "https://github.com/jaehyunjang/vibe-skills"
+homepage = "https://github.com/NewTurn2017/vibe-skills"
 license = "MIT"
 keywords = ["development", "methodology", "workflow", "ai-assisted", "korean"]
 

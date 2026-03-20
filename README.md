@@ -87,7 +87,7 @@
 
 ```bash
 # 1. 저장소 클론
-git clone https://github.com/jaehyunjang/vibe-skills.git ~/.claude/plugins/vibe-skills
+git clone https://github.com/NewTurn2017/vibe-skills.git ~/.claude/plugins/vibe-skills
 
 # 2. 스킬 설치
 cd ~/.claude/plugins/vibe-skills
@@ -1105,7 +1105,7 @@ A: 네, 보완적으로 사용 가능:
 
 ```bash
 # 저장소 클론
-git clone https://github.com/jaehyunjang/vibe-skills.git
+git clone https://github.com/NewTurn2017/vibe-skills.git
 cd vibe-skills
 
 # 의존성 설치
