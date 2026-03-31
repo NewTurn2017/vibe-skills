@@ -320,6 +320,35 @@ ci-pipeline:
 
 ---
 
+## 6.5 UI/UX Design Quality (프론트엔드 변경 포함 시 자동 활성화)
+
+> **활성화 조건**: 변경 파일 목록에 `.tsx`, `.jsx`, `.vue`, `.svelte`, `.css`, `.scss` 파일이 하나라도 있으면 이 섹션을 포함한다. 없으면 생략한다.
+
+### Design Decisions
+| 항목 | 선택 | 근거 |
+|------|------|------|
+| Typography | [폰트 + scale 전략] | [가독성/브랜드 부합 여부] |
+| Color System | [컬러 접근법] | [대비비/접근성/브랜드 일관성] |
+| Layout | [그리드/레이아웃 전략] | [반응형/콘텐츠 우선순위] |
+| Motion | [모션 전략] | [목적성/성능 영향] |
+| Spacing | [spacing scale] | [수직 리듬/일관성] |
+
+### AI-Pattern Avoidance Checklist
+AI가 생성한 UI는 특유의 "AI스러움"이 있다. 아래 안티패턴을 사전에 차단한다:
+
+- [ ] **Typography**: Inter, Roboto 등 과사용 폰트 회피 → 프로젝트 맞춤 폰트 또는 distinctive 폰트 선택
+- [ ] **Color**: cyan-on-dark, purple gradient 등 AI 컬러 회피 → oklch 기반 의도적 팔레트
+- [ ] **Layout**: 카드-in-카드 중첩, 모든 것 center 정렬 회피 → 비대칭 + 의도적 그리드
+- [ ] **Visual**: glassmorphism 남용, 장식용 sparkline 회피 → 브랜드 강화하는 의미있는 장식
+- [ ] **Motion**: bounce/elastic easing 회피 → exponential easing + transform/opacity만
+- [ ] **Interaction**: 모든 버튼을 primary로, 모든 상태를 badge로 회피 → 계층적 UI + progressive disclosure
+- [ ] **Responsive**: 모바일에서 기능 숨기기 회피 → container queries 활용
+- [ ] **UX Writing**: 이미 보이는 정보 반복 회피 → 모든 단어가 자리를 차지할 자격 검증
+
+<!-- MEMO: -->
+
+---
+
 ## 7. 롤백 전략
 
 ### 7.1 롤백 트리거
