@@ -1,7 +1,7 @@
 # Vibe Skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](https://github.com/NewTurn2017/vibe-skills)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](https://github.com/NewTurn2017/vibe-skills)
 
 **Claude Code** · **Cursor** · **Codex CLI** · **OpenCode**
 
@@ -36,6 +36,42 @@ curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/instal
 irm https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.ps1 | iex
 ```
 
+### 설치 스코프
+
+두 가지 스코프를 지원합니다. 용도에 맞게 선택하세요.
+
+| 스코프 | 플래그 | 설치 경로 | 용도 |
+|--------|--------|----------|------|
+| **User** (기본) | `--user` 또는 생략 | `~/.claude/skills/` | 모든 프로젝트에서 사용 |
+| **Project** | `--project` | `.claude/skills/` (프로젝트 루트) | 해당 프로젝트 전용, 팀 공유 가능 |
+
+```bash
+# User scope (기본) — 모든 프로젝트에서 사용
+curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.sh | bash
+
+# Project scope — 현재 프로젝트에만 설치
+curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.sh | bash -s -- --project
+
+# Project scope + 특정 도구
+curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.sh | bash -s -- --project --claude
+```
+
+**Windows (PowerShell)**
+
+```powershell
+# User scope (기본)
+irm https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.ps1 | iex
+
+# Project scope
+.\install.ps1 -Project
+
+# Project scope + 특정 도구
+.\install.ps1 -Project -Claude
+```
+
+> **Project scope를 선택하면** `.claude/skills/` 디렉토리가 프로젝트 루트에 생성됩니다.
+> 이 디렉토리를 git에 커밋하면 팀원 전체가 동일한 스킬을 공유할 수 있습니다.
+
 ### 특정 도구만 설치
 
 ```bash
@@ -59,23 +95,27 @@ curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/instal
 
 모든 도구가 [Agent Skills](https://agentskills.io) 표준을 따르므로 동일한 `SKILL.md` 포맷을 사용합니다.
 
-| 도구 | 글로벌 스킬 경로 | 호환 경로 |
-|------|-----------------|----------|
-| **Claude Code** | `~/.claude/skills/*/SKILL.md` | — |
-| **Cursor** | `~/.cursor/skills/*/SKILL.md` | `~/.claude/skills/` 자동 인식 |
-| **Codex CLI** | `~/.codex/skills/*/SKILL.md` | — |
-| **OpenCode** | `~/.config/opencode/skills/*/SKILL.md` | `~/.claude/skills/` 자동 인식 |
+| 도구 | User 스코프 (글로벌) | Project 스코프 (로컬) | 호환 경로 |
+|------|---------------------|----------------------|----------|
+| **Claude Code** | `~/.claude/skills/` | `.claude/skills/` | — |
+| **Cursor** | `~/.cursor/skills/` | `.cursor/skills/` | `~/.claude/skills/` 자동 인식 |
+| **Codex CLI** | `~/.codex/skills/` | `.codex/skills/` | — |
+| **OpenCode** | `~/.config/opencode/skills/` | `.opencode/skills/` | `~/.claude/skills/` 자동 인식 |
 
-> Cursor와 OpenCode는 `~/.claude/skills/`를 호환 경로로 읽습니다.
-> Claude Code에만 설치해도 이 도구들에서 사용할 수 있지만, 네이티브 경로 설치를 권장합니다.
+> **User scope**: 한 번 설치하면 모든 프로젝트에서 사용 가능. 개인 개발 환경에 적합.
+>
+> **Project scope**: 프로젝트 디렉토리에 설치되어 해당 프로젝트에서만 활성화. git으로 팀 공유 가능.
+>
+> 두 스코프를 동시에 사용할 수 있습니다. Project scope가 User scope보다 우선합니다.
 
 ### 수동 설치
 
 ```bash
 git clone https://github.com/NewTurn2017/vibe-skills.git
 cd vibe-skills
-./install.sh            # 자동 감지
-./install.sh --cursor   # 특정 도구 지정
+./install.sh                    # 자동 감지 (user scope)
+./install.sh --project          # project scope
+./install.sh --project --cursor # project scope + 특정 도구
 ```
 
 ### 설치 확인
@@ -630,6 +670,28 @@ Team Mode는 oh-my-claudecode 플러그인이 필요합니다. 미설치 시 자
 <summary><b>프로젝트별로 다른 설정을 사용할 수 있나요?</b></summary>
 
 네. 프로젝트 루트에 `.vibe/config.yaml`을 생성하면 프로젝트별 설정이 적용됩니다. Smart Mode도 `.vibe/smart-mode.yaml`로 프로젝트별 커스터마이징이 가능합니다.
+
+</details>
+
+<details>
+<summary><b>User scope와 Project scope의 차이가 뭔가요?</b></summary>
+
+**User scope** (`--user`, 기본값)는 `~/.claude/skills/`에 설치되어 모든 프로젝트에서 사용됩니다. 개인 개발 환경에 적합합니다.
+
+**Project scope** (`--project`)는 프로젝트 루트의 `.claude/skills/`에 설치됩니다. git에 커밋하면 팀원 전체가 동일한 스킬을 사용할 수 있습니다. 두 스코프를 동시에 사용할 수 있으며, Project scope가 우선합니다.
+
+</details>
+
+<details>
+<summary><b>팀원과 스킬을 공유하려면 어떻게 하나요?</b></summary>
+
+`--project` 플래그로 설치한 뒤, `.claude/skills/` 디렉토리를 git에 커밋하세요. 팀원이 저장소를 클론하면 별도 설치 없이 바로 스킬을 사용할 수 있습니다.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/NewTurn2017/vibe-skills/main/install.sh | bash -s -- --project --claude
+git add .claude/skills/
+git commit -m "chore: add vibe skills to project"
+```
 
 </details>
 

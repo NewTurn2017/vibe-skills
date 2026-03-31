@@ -9,7 +9,9 @@
 #   --codex      Install for Codex CLI only
 #   --opencode   Install for OpenCode only
 #   --all        Install for all supported tools (skip detection)
-#   (no flag)    Auto-detect installed tools
+#   --project    Install to project-local scope (.claude/skills/ etc.)
+#   --user       Install to user-global scope (default)
+#   (no flag)    Auto-detect installed tools, user scope
 #
 # All tools use the Agent Skills standard (SKILL.md).
 # https://agentskills.io
@@ -18,7 +20,7 @@ set -e
 
 REPO="NewTurn2017/vibe-skills"
 BRANCH="main"
-VERSION="3.1.0"
+VERSION="3.2.0"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -29,6 +31,7 @@ NC='\033[0m'
 
 # ── Parse arguments ──────────────────────────────────────────────────
 TARGETS=()
+SCOPE="user"
 for arg in "$@"; do
     case "$arg" in
         --claude)   TARGETS+=("claude") ;;
@@ -36,9 +39,15 @@ for arg in "$@"; do
         --codex)    TARGETS+=("codex") ;;
         --opencode) TARGETS+=("opencode") ;;
         --all)      TARGETS=("claude" "cursor" "codex" "opencode") ;;
+        --project)  SCOPE="project" ;;
+        --user)     SCOPE="user" ;;
         --help|-h)
-            echo "Usage: install.sh [--claude] [--cursor] [--codex] [--opencode] [--all]"
-            echo "  No flags = auto-detect installed tools"
+            echo "Usage: install.sh [--claude] [--cursor] [--codex] [--opencode] [--all] [--project|--user]"
+            echo "  No flags = auto-detect installed tools, user scope"
+            echo ""
+            echo "  Scope:"
+            echo "    --user      Install to user-global scope (default)"
+            echo "    --project   Install to project-local scope (current directory)"
             exit 0 ;;
     esac
 done
@@ -48,6 +57,11 @@ echo ""
 echo -e "${BOLD}${CYAN}  vibe skills${NC} ${DIM}v${VERSION}${NC}"
 echo -e "${DIM}  AI-driven development methodology${NC}"
 echo -e "${DIM}  Research → Plan → Implement → Review${NC}"
+if [ "$SCOPE" = "project" ]; then
+    echo -e "  ${CYAN}scope${NC} ${DIM}project ($(pwd))${NC}"
+else
+    echo -e "  ${CYAN}scope${NC} ${DIM}user (global)${NC}"
+fi
 echo ""
 
 # ── Auto-detect tools ────────────────────────────────────────────────
@@ -81,6 +95,26 @@ if [ ${#TARGETS[@]} -eq 0 ]; then
     echo -e "  ${DIM}Use --claude, --cursor, --codex, or --opencode to force install.${NC}"
     exit 1
 fi
+
+# ── Resolve install path per target ──────────────────────────────────
+resolve_path() {
+    local target="$1"
+    if [ "$SCOPE" = "project" ]; then
+        case "$target" in
+            claude)   echo ".claude/skills" ;;
+            cursor)   echo ".cursor/skills" ;;
+            codex)    echo ".codex/skills" ;;
+            opencode) echo ".opencode/skills" ;;
+        esac
+    else
+        case "$target" in
+            claude)   echo "$HOME/.claude/skills" ;;
+            cursor)   echo "$HOME/.cursor/skills" ;;
+            codex)    echo "$HOME/.codex/skills" ;;
+            opencode) echo "$HOME/.config/opencode/skills" ;;
+        esac
+    fi
+}
 
 # ── Download ─────────────────────────────────────────────────────────
 TMP_DIR=$(mktemp -d)
@@ -130,17 +164,18 @@ install_skills() {
 # ── Execute ──────────────────────────────────────────────────────────
 echo ""
 for target in "${TARGETS[@]}"; do
+    local_path=$(resolve_path "$target")
     case "$target" in
-        claude)   install_skills "$HOME/.claude/skills"          "Claude Code " ;;
-        cursor)   install_skills "$HOME/.cursor/skills"          "Cursor      " ;;
-        codex)    install_skills "$HOME/.codex/skills"           "Codex CLI   " ;;
-        opencode) install_skills "$HOME/.config/opencode/skills" "OpenCode    " ;;
+        claude)   install_skills "$local_path" "Claude Code " ;;
+        cursor)   install_skills "$local_path" "Cursor      " ;;
+        codex)    install_skills "$local_path" "Codex CLI   " ;;
+        opencode) install_skills "$local_path" "OpenCode    " ;;
     esac
 done
 
 # ── Summary ──────────────────────────────────────────────────────────
 echo ""
-echo -e "  ${GREEN}${BOLD}Done.${NC} ${DIM}${TOTAL} skills installed across ${#TARGETS[@]} tool(s)${NC}"
+echo -e "  ${GREEN}${BOLD}Done.${NC} ${DIM}${TOTAL} skills installed across ${#TARGETS[@]} tool(s) (${SCOPE} scope)${NC}"
 echo ""
 echo -e "  ${CYAN}Commands${NC}"
 echo -e "  ${CYAN}/vibe${NC}            ${DIM}unified command (auto-detects phase)${NC}"
@@ -148,6 +183,14 @@ echo -e "  ${DIM}/vibe-research   deep codebase analysis${NC}"
 echo -e "  ${DIM}/vibe-plan       implementation planning${NC}"
 echo -e "  ${DIM}/vibe-implement  code generation${NC}"
 echo -e "  ${DIM}/vibe-review     automated code review${NC}"
+echo ""
+if [ "$SCOPE" = "project" ]; then
+    echo -e "  ${DIM}Installed to project scope — skills available in this project only.${NC}"
+    echo -e "  ${DIM}Add .claude/skills/ (or .cursor/skills/) to version control to share with your team.${NC}"
+else
+    echo -e "  ${DIM}Installed to user scope — skills available in all projects.${NC}"
+    echo -e "  ${DIM}Use --project to install for a specific project instead.${NC}"
+fi
 echo ""
 echo -e "  ${DIM}Restart your editor/CLI to activate.${NC}"
 echo -e "  ${DIM}https://github.com/${REPO}${NC}"

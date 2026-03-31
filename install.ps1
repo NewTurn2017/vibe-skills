@@ -7,6 +7,8 @@
 #   -Codex      Install for Codex CLI only
 #   -OpenCode   Install for OpenCode only
 #   -All        Install for all supported tools (skip detection)
+#   -Project    Install to project-local scope (.claude/skills/ etc.)
+#   -User       Install to user-global scope (default)
 #
 # All tools use the Agent Skills standard (SKILL.md).
 # https://agentskills.io
@@ -16,14 +18,18 @@ param(
     [switch]$Cursor,
     [switch]$Codex,
     [switch]$OpenCode,
-    [switch]$All
+    [switch]$All,
+    [switch]$Project,
+    [switch]$User
 )
 
 $ErrorActionPreference = "Stop"
 
 $Repo = "NewTurn2017/vibe-skills"
 $Branch = "main"
-$Version = "3.1.0"
+$Version = "3.2.0"
+
+$Scope = if ($Project) { "project" } else { "user" }
 
 # ── Header ───────────────────────────────────────────────────────────
 Write-Host ""
@@ -31,6 +37,13 @@ Write-Host "  vibe skills " -ForegroundColor Cyan -NoNewline
 Write-Host "v$Version" -ForegroundColor DarkGray
 Write-Host "  AI-driven development methodology" -ForegroundColor DarkGray
 Write-Host "  Research -> Plan -> Implement -> Review" -ForegroundColor DarkGray
+if ($Scope -eq "project") {
+    Write-Host "  scope " -ForegroundColor Cyan -NoNewline
+    Write-Host "project ($((Get-Location).Path))" -ForegroundColor DarkGray
+} else {
+    Write-Host "  scope " -ForegroundColor Cyan -NoNewline
+    Write-Host "user (global)" -ForegroundColor DarkGray
+}
 Write-Host ""
 
 # ── Determine targets ────────────────────────────────────────────────
@@ -99,6 +112,26 @@ try {
 $Skills = @("vibe", "vibe-research", "vibe-plan", "vibe-implement", "vibe-review")
 $Total = 0
 
+# ── Resolve install path per target ──────────────────────────────────
+function Resolve-InstallPath {
+    param([string]$Target)
+    if ($Scope -eq "project") {
+        switch ($Target) {
+            "claude"   { return Join-Path "." ".claude" "skills" }
+            "cursor"   { return Join-Path "." ".cursor" "skills" }
+            "codex"    { return Join-Path "." ".codex" "skills" }
+            "opencode" { return Join-Path "." ".opencode" "skills" }
+        }
+    } else {
+        switch ($Target) {
+            "claude"   { return Join-Path $env:USERPROFILE ".claude" "skills" }
+            "cursor"   { return Join-Path $env:USERPROFILE ".cursor" "skills" }
+            "codex"    { return Join-Path $env:USERPROFILE ".codex" "skills" }
+            "opencode" { return Join-Path $env:APPDATA "opencode" "skills" }
+        }
+    }
+}
+
 # ── Install skills to a target directory ─────────────────────────────
 function Install-Skills {
     param([string]$Dir, [string]$Label)
@@ -130,11 +163,12 @@ function Install-Skills {
 # ── Execute ──────────────────────────────────────────────────────────
 Write-Host ""
 foreach ($target in $Targets) {
+    $installPath = Resolve-InstallPath $target
     switch ($target) {
-        "claude"   { $Total += Install-Skills (Join-Path $env:USERPROFILE ".claude" "skills")   "Claude Code " }
-        "cursor"   { $Total += Install-Skills (Join-Path $env:USERPROFILE ".cursor" "skills")   "Cursor      " }
-        "codex"    { $Total += Install-Skills (Join-Path $env:USERPROFILE ".codex" "skills")    "Codex CLI   " }
-        "opencode" { $Total += Install-Skills (Join-Path $env:APPDATA "opencode" "skills")      "OpenCode    " }
+        "claude"   { $Total += Install-Skills $installPath "Claude Code " }
+        "cursor"   { $Total += Install-Skills $installPath "Cursor      " }
+        "codex"    { $Total += Install-Skills $installPath "Codex CLI   " }
+        "opencode" { $Total += Install-Skills $installPath "OpenCode    " }
     }
 }
 
@@ -144,7 +178,7 @@ Remove-Item $TmpDir -Recurse -Force -ErrorAction SilentlyContinue
 # ── Summary ──────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "  Done. " -ForegroundColor Green -NoNewline
-Write-Host "$Total skills installed across $($Targets.Count) tool(s)" -ForegroundColor DarkGray
+Write-Host "$Total skills installed across $($Targets.Count) tool(s) ($Scope scope)" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Commands" -ForegroundColor Cyan
 Write-Host "  " -NoNewline; Write-Host "/vibe" -ForegroundColor Cyan -NoNewline
@@ -153,6 +187,14 @@ Write-Host "  /vibe-research   deep codebase analysis" -ForegroundColor DarkGray
 Write-Host "  /vibe-plan       implementation planning" -ForegroundColor DarkGray
 Write-Host "  /vibe-implement  code generation" -ForegroundColor DarkGray
 Write-Host "  /vibe-review     automated code review" -ForegroundColor DarkGray
+Write-Host ""
+if ($Scope -eq "project") {
+    Write-Host "  Installed to project scope - skills available in this project only." -ForegroundColor DarkGray
+    Write-Host "  Add .claude\skills\ (or .cursor\skills\) to version control to share with your team." -ForegroundColor DarkGray
+} else {
+    Write-Host "  Installed to user scope - skills available in all projects." -ForegroundColor DarkGray
+    Write-Host "  Use -Project to install for a specific project instead." -ForegroundColor DarkGray
+}
 Write-Host ""
 Write-Host "  Restart your editor/CLI to activate." -ForegroundColor DarkGray
 Write-Host "  https://github.com/$Repo" -ForegroundColor DarkGray
